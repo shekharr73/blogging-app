@@ -1,5 +1,5 @@
 const { Schema, model } = require("mongoose");
-const { createHmac,randomBytes } = require('crypto');
+const { createHmac,randomBytes, hash } = require('crypto');
 const { constants } = require("fs/promises");
 
 
@@ -45,6 +45,10 @@ userSchema.pre('save', function(next){
     .update(user.password)
     .digest("hex")
 
+    this.salt = salt;
+    this.password = hashedPassword;
+
+    next()
 })
 
 const User = model("user", userSchema);
