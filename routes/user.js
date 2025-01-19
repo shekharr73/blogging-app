@@ -11,22 +11,25 @@ router.get("/signup", (req, res) => {
   return res.render("signup");
 });
 
-router.post("/signup", (req, res) => {
-  const { email, password } = req.body;
-  const user = User.matchPassword(email, password);
-
-  console.log('User', user);
-  return res.redirect("/")
-});
-
 router.post("/signup", async (req, res) => {
   const { fullName, email, password } = req.body;
-  await User.create({
-    fullName,
-    email,
-    password
-  });
-  return res.redirect("/");
+
+  try {
+    const user = await User.create({
+      fullName,
+      email,
+      password
+    });
+
+    // Optionally, you can check the password here if needed
+    const isMatch = await user.matchPassword(password);
+    console.log('Password match:', isMatch);
+
+    return res.redirect("/");
+  } catch (error) {
+    console.error("Error creating user:", error);
+    return res.status(500).send("Internal Server Error");
+  }
 });
 
 module.exports = router;

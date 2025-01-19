@@ -1,4 +1,4 @@
-const { Schema, model, Error } = require("mongoose");
+const { Schema, model } = require("mongoose");
 const { createHmac, randomBytes } = require('node:crypto');
 
 const userSchema = new Schema(
@@ -26,7 +26,7 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ["USER", "ADMIN"], // Ensure USER is included
+      enum: ["USER", "ADMIN"],
       default: "USER",
     },
   },
@@ -38,7 +38,7 @@ userSchema.pre('save', function(next) {
 
   if (!user.isModified("password")) return next();
 
-  const salt = randomBytes(16).toString();
+  const salt = 'someRandomSalt';
   const hashedPassword = createHmac("sha256", salt)
     .update(user.password)
     .digest("hex");
@@ -49,21 +49,13 @@ userSchema.pre('save', function(next) {
   next();
 });
 
-userSchema.static('matchPassword', function (email, password) {
-  const user = this.findOne({email});
-  if(!user) throw new Error('User not found');
-
-  const salt = "someRandomSalt";
-  const hashedPassword = user.password;
-
-  const userProvideHash = createHmac("sha256", salt)
-  .update(password)
-  .digest("hex")
-
-  if(hashedPassword !== userProvideHash) throw new Error('incorrect password')
-
-  return {...user, password: undefined, salt: undefined};
-})
+// Password matching method
+userSchema.methods.matchPassword = async function(enteredPassword) {
+  const hashedPassword = createHmac("sha256", this.salt)
+    .update(enteredPassword)
+    .digest("hex");
+  return hashedPassword === this.password;
+};
 
 const User = model("user", userSchema);
 
