@@ -13,7 +13,7 @@ router.get("/signup", (req, res) => {
 
 router.post("/signup", (req, res) => {
   const { email, password } = req.body;
-  
+  const user = User.matchPassword(email, password);
 });
 
 router.post("/signup", async (req, res) => {
