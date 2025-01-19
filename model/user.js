@@ -1,5 +1,5 @@
 const { Schema, model } = require("mongoose");
-const { createHmac,randomBytes, hash } = require('crypto');
+const { createHmac,randomBytes, hash } = require('node:crypto');
 const { constants } = require("fs/promises");
 
 
@@ -10,12 +10,12 @@ const userSchema = new Schema(
       required: true
     },
     email: {
+      type:String,
       required: true,
       unique: true
     },
     salt: {
       type: String,
-      requred: true
     },
     password: {
       type: String,
