@@ -49,6 +49,20 @@ userSchema.pre('save', function(next) {
   next();
 });
 
+userSchema.static('matchPassword', function (email, password) {
+  const user = this.findOne({email});
+  if(!user) return false;
+
+  const salt = user.salt;
+  const hashedPassword = user.password;
+
+  const userProvideHash = createHmac("sha256", salt)
+  .update(password)
+  .digest("hex")
+
+  return hashedPassword === userProvideHash;
+})
+
 const User = model("user", userSchema);
 
 module.exports = User;
