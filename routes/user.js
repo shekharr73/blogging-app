@@ -11,6 +11,10 @@ router.get("/signup", (req, res) => {
   return res.render("signup");
 });
 
+router.post("/signup", (req, res) => {
+  const {email, password} = req.body;
+})
+
 router.post("/signup", async(req, res) => {
   const { fullName, email, password } = req.body;
   await User.create({

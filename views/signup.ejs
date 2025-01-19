@@ -9,16 +9,15 @@
 <body>
     <%- include('./partials/nav') %>
     
-    <div class="container mt-5" action="/user/signup" method="post">
-        <form>
+    <div class="container mt-5">
+        <form action="/user/signup" method="post">
             <div class="mb-3">
-                <label for="exampleInputEmail1" class="fullName">Full Name</label>
-                <input type="text" class="form-control" id="fullName" name="fullName" aria-describedby="emailHelp">
+                <label for="fullName" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="fullName" name="fullName" aria-describedby="fullNameHelp">
             </div>
             <div class="mb-3">
                 <label for="exampleInputEmail1" class="form-label">Email address</label>
                 <input type="email" class="form-control" id="exampleInputEmail1" name="email" aria-describedby="emailHelp">
-            
             </div>
             <div class="mb-3">
                 <label for="exampleInputPassword1" class="form-label">Password</label>
@@ -28,6 +27,5 @@
         </form>
     </div>
     <%- include('./partials/script') %>
-
 </body>
 </html>

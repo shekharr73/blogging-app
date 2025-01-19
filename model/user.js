@@ -1,16 +1,14 @@
 const { Schema, model } = require("mongoose");
-const { createHmac,randomBytes, hash } = require('node:crypto');
-const { constants } = require("fs/promises");
-
+const { createHmac, randomBytes } = require('node:crypto');
 
 const userSchema = new Schema(
   {
-    fullname: {
+    fullName: {
       type: String,
       required: true
     },
     email: {
-      type:String,
+      type: String,
       required: true,
       unique: true
     },
@@ -26,30 +24,30 @@ const userSchema = new Schema(
       type: String,
       default: "/images/default.png"
     },
-    role:{
-        type: String,
-        enum:("USER","ADMIN"),
-        default: "USER",
+    role: {
+      type: String,
+      enum: ["USER", "ADMIN"], // Ensure USER is included
+      default: "USER",
     },
   },
   { timestamps: true }
 );
 
-userSchema.pre('save', function(next){
-    const user = this;
+userSchema.pre('save', function(next) {
+  const user = this;
 
-    if(!user.isModified("password")) return;
+  if (!user.isModified("password")) return next();
 
-    const salt = randomBytes(16).toString();
-    const hashedPassword = createHmac("sha256", salt)
+  const salt = randomBytes(16).toString();
+  const hashedPassword = createHmac("sha256", salt)
     .update(user.password)
-    .digest("hex")
+    .digest("hex");
 
-    this.salt = salt;
-    this.password = hashedPassword;
+  this.salt = salt;
+  this.password = hashedPassword;
 
-    next()
-})
+  next();
+});
 
 const User = model("user", userSchema);
 
