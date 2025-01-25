@@ -37,7 +37,4 @@ app.use('/user',userRoute)
 // If any request start with /user then use `userRoute`
 app.use('/blog',blogRoute) 
 
-
-
-
 app.listen(PORT , ()=>console.log(`Server started at PORT:${PORT}`));

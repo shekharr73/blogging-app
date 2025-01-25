@@ -1,62 +1,72 @@
-const { Schema, model } = require("mongoose");
-const { createHmac, randomBytes } = require('node:crypto');
+const {Schema,model}= require('mongoose');
+const { createHmac ,randomBytes } = require('node:crypto');
+const {createTokenForUser} = require('../services/authentication')
 
 const userSchema = new Schema(
-  {
-    fullName: {
-      type: String,
-      required: true
+{
+    fullName:{
+        type:'String',
+        required : true
     },
-    email: {
-      type: String,
-      required: true,
-      unique: true
+    email:{
+        type:String,
+        required:true,
+        unique:true
     },
-    salt: {
-      type: String,
+    salt:{
+        type:String,
+    }
+    ,
+    password:{
+        type:String,
+        requied:true
     },
-    password: {
-      type: String,
-      required: true,
-      unique: true
+    profileImageURL:{
+        type:String,
+        default:'/images/default.png',
     },
-    profileImageURl: {
-      type: String,
-      default: "/images/default.png"
-    },
-    role: {
-      type: String,
-      enum: ["USER", "ADMIN"],
-      default: "USER",
-    },
-  },
-  { timestamps: true }
-);
+    role:{
+        type:String,
+        enum:["USER","ADMIN"],
+        default:"USER",
+    }
+},
+{timestamp: true}
+); 
 
-userSchema.pre('save', function(next) {
-  const user = this;
-
-  if (!user.isModified("password")) return next();
-
-  const salt = randomBytes(16).toString();
-  const hashedPassword = createHmac("sha256", salt)
+//using pre middleware of mangoose
+userSchema.pre('save',function(){
+    const user = this;
+    if(!user.isModified("password")) return;
+    const salt = randomBytes(16).toString(); //random string
+    const hashedPassword = createHmac('sha256',salt)
     .update(user.password)
     .digest("hex");
+    this.salt = salt;
+    this.password=hashedPassword;
 
-  this.salt = salt;
-  this.password = hashedPassword;
+})
 
-  next();
-});
+//making function
+userSchema.static('matchPasswordAndGenerateToken',async function(email,password){
+    const user =await this.findOne({email});
+    if(!user) throw new Error('User not found !');
 
-// Password matching method
-userSchema.methods.matchPassword = async function(enteredPassword) {
-  const hashedPassword = createHmac("sha256", this.salt)
-    .update(enteredPassword)
-    .digest("hex");
-  return hashedPassword === this.password;
-};
+    console.log(user);
+    const salt = user.salt;
+    const hashedPassword = user.password;
 
-const User = model("user", userSchema);
+    const userProvideHash = createHmac("sha256",salt)
+    .update(password)
+    .digest("hex")
 
-module.exports = User;
+    if(hashedPassword !== userProvideHash){
+        throw new Error("Incorrect Password!");
+    }
+    const token = createTokenForUser(user)
+    return token;
+})
+
+const User = model('user',userSchema)
+
+module.exports= User;
