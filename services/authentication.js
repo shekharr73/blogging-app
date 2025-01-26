@@ -21,5 +21,6 @@ function validateToken(token){
 
 module.exports ={
     createTokenForUser,
-    validateToken
+    validateToken,
+    
 }
