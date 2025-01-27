@@ -1,4 +1,5 @@
 const express = require('express');
+const morgan = require('morgan'); // Added morgan for logging
 const path = require('path');    
 const ejs = require('ejs')
 const mongoose = require('mongoose')
@@ -14,13 +15,14 @@ const blogRoute = require('./routes/blog')
 
 const { checkForAuthenticationCookie } = require('./middlewares/authentication');
 const app = express();
-const PORT = 8000; // Changed port to 8080
+const PORT = 8080; // Changed port to 8080
 
 app.set("view engine","ejs")
 app.set("views", path.resolve( "views"));
 
 //middleware
-app.use(express.urlencoded({extended:false}))
+app.use(morgan('dev')); // Use morgan to log requests
+app.use(express.urlencoded({extended:false}));
 app.use(cookieParser())
 app.use(checkForAuthenticationCookie("token"))
 app.use(express.static(path.resolve('./public')))
