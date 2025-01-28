@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express');
 const morgan = require('morgan');
 const path = require('path');    
@@ -15,7 +16,7 @@ const blogRoute = require('./routes/blog')
 
 const { checkForAuthenticationCookie } = require('./middlewares/authentication');
 const app = express();
-const PORT = process.env.port || 8080;
+const PORT = process.env.PORT || 8080;
 
 app.set("view engine","ejs")
 app.set("views", path.resolve( "views"));
