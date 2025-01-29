@@ -33,10 +33,18 @@ router.post('/', upload.single('coverImage'), async(req, res)=>{
     return res.redirect(`/blog/${blog._id}`)
 })
 
-router.get('/:id',async(req, res)=>{
+router.get('/:id', async(req, res)=>{
     const blog = await Blog.findById(req.params.id).populate("createdBy");
-    const comments = await Comment.find({blogId: req.params.id}).populate("createdBy")
-    console.log("blog: ",blog)
+    const comments = await Comment.find({blogId: req.params.id}).populate("createdBy");
+    
+    // Check if blog.createdBy is null
+    if (!blog.createdBy) {
+        blog.createdBy = {
+            profileImageURL: '/images/default.png', // Default image
+            fullName: 'Unknown User' // Default name
+        };
+    }
+
     return res.render('blog',{
         user: req.user,
         blog,
@@ -44,13 +52,13 @@ router.get('/:id',async(req, res)=>{
     })
 })
 
-router.post('/comment/:blogId',async(req,res)=>{
+router.post('/comment/:blogId', async(req,res)=>{
     await Comment.create({
         content: req.body.content,
         blogId: req.params.blogId,
         createdBy: req.user._id,
     })
     return res.redirect(`/blog/${req.params.blogId}`)
-    
 })
+
 module.exports = router;

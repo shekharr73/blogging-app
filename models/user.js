@@ -18,7 +18,7 @@ const userSchema = new Schema(
     },
     password: {
         type: String,
-        required: true // Fixed typo here
+        required: true 
     },
     profileImageURL: {
         type: String,
@@ -33,11 +33,11 @@ const userSchema = new Schema(
 { timestamps: true }
 );
 
-// Using pre middleware of mongoose
+
 userSchema.pre('save', function() {
     const user = this;
     if (!user.isModified("password")) return;
-    const newSalt = randomBytes(16).toString(); // Renamed variable
+    const newSalt = randomBytes(16).toString(); 
     const newHashedPassword = createHmac('sha256', newSalt)
     .update(user.password)
     .digest("hex");
